@@ -1,0 +1,55 @@
+1.框架:
+tolua:其热更新主要是依托于LuaFramework框架的.
+注意:lua调用C#,是通过"."来调用非静态的变量及静态的变量与方法的；用“：”调用非静态方法
+LuaFrameWork是从simpleLuaFramwork转变而来,改善了新的AB包机制Unity5+
+
+2.LuaFramwork基础用法:
+LuaFramework的基础用法其实很简单,不管是NGUI还是UGUI框架下载完都要执行下面的步骤即可正常运行：
+（1）执行菜单“Lua/Generate All”,生成所有相关wrap文件.
+（2）执行菜单“LuaFramework/Build xxx Resource”,根据配置将素材文件+lua代码统一build到StreaminAssets目录下面去.
+（3）运行游戏!会执行素材解包流程,如果是Windows,会释放到“c:/luaframework”下面.
+	安卓与iOS都会释放到沙盒目录下,mac会释放到当前框架目录下.框架会加载解包目录下面的素材+lua文件.
+（4）执行菜单“Lua/Clear wrap files”会将第一步生成的wrap清除掉,如果你c#提供给lua的函数发生变化,一定要先clear后,再执行第一步,否则会不生效.
+
+3.框架对应功能
+(1)提供Lua-c#值类型、对象类型转化操作交互层.（ObjectTranslator.cs、LuaFunction.cs、LuaTable.cs、ToLua.cs等
+(2)提供Lua虚拟机创建、启动、销毁,Require、DoFile、DoString、Traceback等相关支持.（LuaState.cs、LuaStatic.cs
+(3)提供导出工具,利用c#反射,对指定的c#类生成对应的wrap文件,启动后将所有wrap文件注册到lua虚拟机中.（ToLuaMenu.cs、ToLuaExport.cs、ToLuaTree.cs、LuaBinder.cs、CustomSetting.cs等
+(4)提供c#对象和lua userdata对应关系,使该userdata能访问对应c#对象属性,调用对应c#对象函数.lua支持一定的面向对象(类、继承).管理这些对象的内存分配与生命周期、GC.(LuaState.cs
+(5)提供支持功能Lua Coroutine、反射等,Lua层重写部分性能有问题对象如Vector系列.（Vector3.lua等）
+(6)LuaState继承自LuaStatePtr,该类包含一个System.IntPtr L指针,即lua虚拟机栈,并提供了一系列LuaDLL API的封装,可以认为是LuaDLL的升级版.而成员属性中比较重要的有ObjectTranslator和LuaReflection,暂时我们只用关注ObjectTranslator.
+(7)new LuaState()
+①初始化了LuaState成员属性ObjectTranslator和LuaReflection. 
+②LuaState构造开始. 
+③构造中先初始化了LuaException用于异常时抛出,提供了出错信息堆栈的格式化显示. 
+④以标准的LuaDLL.luaL_newstate语句正式启动lua虚拟机. 
+⑤luaL_openlibs开启lua基本库,额外地在c层初始了tolua的一些相关内容. 
+⑥OpenToLuaLibs向lua虚拟机注册ToLua.Print、ToLua.DoFile、Panic等基础c函数. 
+⑦OpenBaseLibs先向虚拟机注册了一些System和Unity命名空间下的基础类,接着初始化了Mathf、Layer和一些反射相关. 
+⑧InitLuaPath在LuaFileUtils中存储了lua中package.path、LuaConst中一些路径搜索路径.用于查找文件. 
+⑨LuaState构造结束.
+LuaState.Start()先是DoFile(“tolua.lua”),而tolua.lua中require了所有tolua重写的一些Unity性能有问题的类型,例如Vector3、Vector2、Bound等.接着在C#缓存了这些类型的一些lua方法.
+
+LuaBinder.cs这个文件是ToLua导出自动生成的,而Bind函数是向lua虚拟机注册所有的wrap类.
+lua调用c#比c#调用lua效率要高.Lua调用Wrap,Wrap调用C#的模式,实现了Lua调用C#.
+尽最多可能使用lua中的容器table取代c#中的所有容器,因为lua的table是c语言实现,效率比c#最快的容器Dictionary还要快.
+安卓平台如果使用luajit的话,记得在lua最开始执行的地方请开启jit.off(),性能会提升N倍.
+loadassembly 反射 
+require 非反射
+
+4.tolua基础:
+[DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)] 
+其中LUADLL对应的字符串就是tolua,在不同的平台上mono会去加载对应的tolua.dll或者tolua.so等文件并调用对应的函数.
+(1)LuaAttribute.cs 
+在tolua生成绑定代码时做一些标示使用. 
+(2)LuaBaseRef.cs 
+Lua中对象对应C#中对象的一个基类,主要作用是有一个reference指向lua里面的对象,引用计数判断两个对象是否相等等. 
+比如LuaFunction里面的reference是指向lua里面的一个闭包的,而LuaTable的reference是指向lua中的一个table的. 
+(3)LuaDll.cs 
+这个类的主要作用就是实现了C#调用原生代码的功能. 
+(4)LuaState.cs 
+这里面是对真正的lua_State的封装,包括初始化lua路径,加载相应的lua文件,注册我们前面生成的绑定代码以及各种辅助函数. 
+(5)ObjectTranslator.cs 
+主要意义就是给lua中对C#对象的交互提供了基础,简单来说就是C#中的对象在传给lua时并不是直接把对象暴露给了lua,而是在这个OjbectTranslator里面注册并返回一个索引（可以理解为windows编程中的句柄）,并把这个索引包装成一个userdata传递给lua,并且设置元表.具体可以查看tolua_pushnewudata代码.
+
+ 
