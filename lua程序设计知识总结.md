@@ -677,56 +677,37 @@ end
 
 
 #十八、数学库
-math.pi 			-- 圆周率 = 3.14159265358979323846
-
-math.abs(x) 		-- 绝对值
-math.ceil(x)		-- 不小于x的最小整数
-math.floor(x)		-- 不大于x的最大整数
-
-math.rad(180)		-- 角度转弧度
-math.deg(math.pi) 	-- 弧度转角度
-
--- 正弦,余弦,正切函数
-math.sin(math.rad(30))	-- 0.5
-math.cos(math.rad(60))	-- 0.5
-math.tan(math.rad(45)) 	-- 1
--- 反正弦,反余弦,反正切函数
-math.acos(0.5)			-- 1.04719755
-math.asin(0.5)			-- 0.52359877
-math.atan(0.5)			-- 0.463647609
-math.atan2(90.0, 45.0)	-- 1.10714871-- x / y的反正切值
--- 双曲线正弦,余弦,正切函数
-math.sinh(0.5)			-- 0.5210953
-math.tanh(0.5)			-- 0.46211715
-math.cosh(0.5)			-- 1.276259652
-
--- 得到x的y次方
-math.pow(2, 5)			-- 32
--- 开平方函数
-math.sqrt(16)			-- 4
--- 计算以e为底x次方值
-math.exp(2)				-- 2.718281828
--- 取模运算
-math.fmod(14, 5)		-- 4
--- 把数分为整数和小数
-math.modf(15.98)		-- 15    98
-
--- 把双精度数val分解为数字部分（尾数）和以2为底的指数n，即val=x*2^n
-math.frexp(10.0)		-- 0.625    4
--- 计算value * 2的n次方
-math.ldexp(10.0, 3)		-- 80 = 10 * (2 ^3)
--- 计算以10为基数的对数
-math.log10(100)			-- 2
--- 计算一个数字的自然对数
-math.log(2.71)			-- 0.9969
-
-math.max(2.71, 100, -98, 23)-- 取得参数中最大值
-math.min(2.71, 100, -98, 23)-- 取得参数中最小值
-
-math.randomseed(os.time())	-- 设置随机数种子,在使用math.random函数之前必须使用此函数设置随机数种子
-math.random()				-- 获取[0,1)的随机数
-math.random(100)			-- 获取[1,100]的随机数
-math.random(2, 6)			-- 获取[2,6]的随机数
+function|describe|栗子
+--|:--:|--
+math.pi | 圆周率(3.14159265358979323846)
+math.abs| 绝对值|math.abs(-5.1) == 5.1
+math.ceil| 不小于x的最小整数|math.ceil(2.1) == 3 
+math.floor| 不大于x的最大整数|math.floor(1.3) == 1 
+math.rad|角度转弧度|math.rad(180) == math.pi
+math.deg| 弧度转角度|math.rad(math.pi) == 180
+math.sin| 正弦|math.sin(math.pi) = 0
+math.cos|余弦|math.cos(math.rad(60))== 0.5
+math.tan|正切|math.tan(math.rad(45))| 1
+math.asin|反正弦|math.asin(1) == 1.57
+math.acos|反余弦|math.acos(0) == 1.57
+math.atan|反正切|math.atan(1) == 0.785
+math.atan2|x / y的反正切值|math.atan2(45, 45) == 0.785
+math.sinh|	双曲线正弦|	math.sinh(0.5) == 0.5210953
+math.tanh|	双曲线余弦|	math.tanh(0.5) == 0.46211715
+math.cosh|	双曲线正切|	math.cosh(0.5) == 1.276259652
+math.pow|得到x的y次方|math.pow(2, 5) == 32
+math.sqrt|开平方函数|math.sqrt(16) == 4
+math.exp|计算以e为底x次方值|math.exp(2) == 2.718281828
+math.fmod|取模运算|math.fmod(14, 5) == 4
+math.modf|把数分为整数和小数|math.modf(15.98) == 15,98
+math.frexp|把双精度val分解为数字部分(尾数)和以2为底的指数n，即val=x*2^n|math.frexp(10.0) == 0.625,4
+math.ldexp|value * 2的n次方|math.ldexp(10.0, 3) == 80
+math.log10|以10为基数的对数|math.log10(100) == 2
+math.log|一个数字的自然对数|math.log(2.71) == 0.9969
+math.max|取得参数中最大值|math.max(2.71, 100, -98, 23) == 100
+math.min|取得参数中最小值|math.min(2.71, 100, -98, 23) == -98
+math.randomseed|设置随机种子,在使用math.random之前须使用此函数|math.randomseed(os.time())
+math.random|获取随机数|math.random():[0,1)的随机数;math.random(100):[1,100]的随机数;math.random(2, 6):[2,6]的随机数
 
 #十九、table库
 table.insert(tab, pos, value)		-- 指定位置pos(默认结尾)插入value
@@ -994,80 +975,88 @@ seek():获取和设置一个文件的当前位置;f:seek(whence, offset),
 返回值:与whence无关,总是返回当前文件位置(相对于文件起始处的偏移字节数)
 因此调用file:seek()不会改变文件当前位置,并返回当前文件位置;
 
+```
 -- 不改变文件位置并返回文件大小;
 function getFileSize(file)
-	local cur = file:seek()			-- 获取当前位置
-	lcoal size = file:seek("end")	-- 获取大小
-	file:seek("set", cur)			-- 恢复
-	return size
+    local cur = file:seek()			-- 获取当前位置
+    lcoal size = file:seek("end")	-- 获取大小
+    file:seek("set", cur)			-- 恢复
+    return size
 end
+```
 
 #22.操作系统库
-操作系统库定义在table os中,包含文件操作,获取当期那日期和时间的函数,以及其他一些与操作系统相关的功能;
-为保证lua的可移植性,lua只使用ANSI标准;而目录操作和套接字这类操作系统功能并不是ANSI的一部分,因此操作系统库不含他们;
-luasocket:提供网络支持;
-对文件的操作只提供了连个函数,一个改名os,rename()和删除文件os.remove()
+	操作系统库定义在os中,包含文件操作,获取当期那日期和时间的函数,以及其他一些与操作系统相关的功能;
+	为保证lua的可移植性,lua只使用ANSI标准;而目录操作和套接字这类操作系统功能并不是ANSI的一部分,因此操作系统库不含他们;
+	luasocket:提供网络支持;
+	对文件的操作只提供了两个函数,改名os.rename()和删除文件os.remove()**
 
-1.os.time()		-- 不带任何参数,则返回数字形式的时间(大多数系统返回秒数)
---传参:tab:返回一个数字,表示该table中描述的日期和时间.tab具有以下有效字段:
-year:完整年份		-- 必须
-month:01-12			-- 必须
-day:01-31			-- 必须
-hour:00-23			-- 默认值(12:00)
-min:00-59		
-sec:00-59
-isdst:一个bool,true表示夏令时
-
---例子
+1. **os.time()**	
+	不传参数,则返回数字形式的时间(大多数系统返回秒数)
+	传参:tab:返回一个数字,表示该table中描述的日期和时间.tab具有以下有效字段:
+	+ year:完整年份		-- 必须
+	+ month:01-12		-- 必须
+	+ day:01-31			-- 必须
+	+ hour:00-23		-- 默认值(12:00)
+	+ min:00-59		
+	+ sec:00-59
+	+ isdst:一个bool,true表示夏令时
+```
 os.time(year = 1970, month = 1, day =1 , hour = 0) -->10800(不同系统不同地区不一样)
+```
+2. **os.date()**		
+	time的反函数,第一个参数是格式字符串,指定时间表现形式;第二参数是时间的数字,(可不填)默认为当期时间
+```
+	os.date("*t", number)	-- 返回一个table，结果基于当前时区的计算(例如北京时间1970.1.1,08:00:00)
+	os.date("!*t", number)	-- 返回一个table，结果基于标准时区的计算
+	os.date("%m/%d/%Y", number)	-- 返回一个string,如:1/1/1970
+	os.date("%X", number)	-- 返回一个string,如:23:48:10
+```
+**注意**:os.date返回的table还包含一些额外的字段,星期数(wday:1表示星期天),一年中的第几天(yday:1是一月一日)
+其他格式字符串,os.date会将日期转化为一个字符串,该字符串是格式字符串的一个复制,但其中的特殊标记被替换为时间信息.所有标记以"%"开头;
+* %a  星期的简写(Wed)
+* %A	-- 星期的全写(Wednesday)
+* %b	-- 月份简写(Sep)
+* %B 	-- 月份全写(September)
+* %c	-- 日期和时间(eg:09/16/98 23:48:10) 默认值	*随区域和系统变化
+* %d	-- 一个月的第几天(16)
+* %H	-- 24小时制的小时数(00-23)
+* %I	-- 12小时制(01-12)
+* %j	-- 一年中的第几天(001-366)
+* %M  -- 分钟数(00-59)
+* %m  -- 月份数(01-12)
+* %p  -- 上午/下午(am/pm)
+* %S  -- 秒数(00-59)
+* %w  -- 一周中的第几天(0-6)星期天-星期六
+* %x  -- 日期(09/16/98) 	*随区域和系统变化
+* %X  -- 时间(23:48:10)	*随区域和系统变化
+* %y  -- 两位数的年份(00-99)
+* %Y	-- 完整年份(1998)
+* %% 	-- 字符'%'
 
-2.os.date()		-- time得反函数,第一个参数是格式字符串,指定时间表现形式;第二参数是时间的数字,默认为当期时间
-
--- 生成一个tab
-os.date("*t", number)
-注意:os.date还包含一些额外的字段,星期数(wday,1表示星期天),一年中的第几天(yday,1是一月一日)
-其他格式字符串,os.date会将日期转化为一个字符串,这个字符串是传入格式字符串的一个复制,但其中的特殊标记被替换为时间信息.
-所有标记以"%"开头;
-%a	-- 星期的简写(Wed)
-%A	-- 星期的全写(Wednesday)
-%b	-- 月份简写(Sep)
-%B 	-- 月份全写(September)
-%c	-- 日期和时间(eg:09/16/98 23:48:10) 默认值	*随区域和系统变化
-%d	-- 一个月的第几天(16)
-%H	-- 24小时制的小时数(00-23)
-%I	-- 12小时制(01-12)
-%j	-- 一年中的第几天(001-366)
-%M  -- 分钟数(00-59)
-%m  -- 月份数(01-12)
-%p  -- 上午/下午(am/pm)
-%S  -- 秒数(00-59)
-%w  -- 一周中的第几天(0-6)星期天-星期六
-%x  -- 日期(09/16/98) 	*随区域和系统变化
-%X  -- 时间(23:48:10)	*随区域和系统变化
-%y  -- 两位数的年份(00-99)
-%Y	-- 完整年份(1998)
-%% 	-- 字符'%'
-
-若需要固定的表现形式类似mm/dd/yyyy,可以使用显示格式字符串"%m/%d/%Y"
-
-3.os.clock() 返回当前CPU时间的秒数,一般可计算一段代码的执行时间;
---计算一段代码的执行时间:
+3. **os.clock()**
+```
+-- 返回当前CPU时间的秒数,一般可计算一段代码的执行时间;
 local x = os.clock()
 local s = 0
 for i = 1,100000 do s = s+1 end
 print(string.format("elapsed time: %.2f\n", os.clock() - x))
-
-4.os.exit()		-- 终止当前程序执行.
-5.os.getenv()	-- 获取一个环境变量的值,并接受一个变量名.返回对应的字符串值;
-6.os.execute() 	-- 执行一条系统命令,等价于c的system函数,需要接受一个命令字符串,并返回一个错误代码.
-7.os.setlocale()-- 设置当前lua程序所使用的区域.区域定义了不同文化或语言间的差异;
-区域中有6种分类:
-"collate"控制字符串的字母顺序,
-"ctype"控制单个字符的类型及其大小写的转换
-"monetary"不影响lua程序
-"numeric"控制如何格式化数字
-"time"控制如何格式化时间;
-"all"控制上述所有功能.(default)
+```
+4. **os.exit()**	
+	终止当前程序执行.
+5. **os.getenv()**	
+	获取一个环境变量的值,并接受一个变量名.返回对应的字符串值;
+6. **os.execute()**	
+	执行一条系统命令,等价于c的system函数,需要接受一个命令字符串,并返回一个错误代码.
+7. **os.setlocale()** 
+	设置当前lua程序所使用的区域.区域定义了不同文化或语言间的差异;
+	区域中有6种分类:
+	- "collate"控制字符串的字母顺序,
+	- "ctype"控制单个字符的类型及其大小写的转换
+	- "monetary"不影响lua程序
+	- "numeric"控制如何格式化数字
+	- "time"控制如何格式化时间
+	- "all"控制上述所有功能.(default)
 
 
 #23.调试库
