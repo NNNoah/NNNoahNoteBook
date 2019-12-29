@@ -37,23 +37,24 @@ function| 函数      | 第一类值，可以将函数名作为变量使用，�
 userdata| 自定义类型|
 thread  | 线程      |并不是不是真正的抢先式多线程
 
-* lua只有nil和false是假|;0，””在判断真假时，为真，
-* \ddd 数值转换成字符；
-* “10”+1：字符串参与运算会自动字符串转化成number；
-* [[ ]] 		存放多行字符串
-* ..			字符串连接符(操作符左右有数字会自动将数值转换为字符串)
-* t ={}    	-- 创建了一个table，Key,value 形式 
-* #t --table最大索引值(数组部分)
 
+* lua只有nil和false是假|;0，""在判断真假时，为真，
+* \ddd 	:数值转换成字符；
+* “10”+1	：字符串参与运算会自动字符串转化成number；
+* [[ ]] 		:存放多行字符串
+* ..			:字符串连接符(操作符左右有数字会自动将数值转换为字符串)
+* t = {}    	: 创建了一个table,lua的赋值即是构造
+* #t :table最大索引值(数组部分)
 
 #三.表达式
-1.算术：+ 、-、*、/ 、%、 ^(乘幂)
+1. 算术：+ 、-、*、/ 、%、 ^(乘幂)
 平方根：x^0.5 ,平方: x^2
 得到数的小数部分：X%1 
 整数部分：x-x%1
 取得小数点两位后的小数部分X%0.01
-2.关系 ：<,>,<=,>=,==,    ~=(不等于)
-3.逻辑 : and, or, not
+2. 关系 ：<,>,<=,>=,==,    ~=(不等于)
+3. 逻辑 : and, or, not
+
 4 and 5 :为真返回第二个数5；
 nil and 5:为假返回nil；
 x = x or v --等价于 if not x then x = v end
@@ -84,19 +85,18 @@ for i,v in ipairs(a) do (语句) end -- 是通过iterator来遍历所有值。
 
 #五.函数
 1. ： 			-- 冒号操作符 o.foo(o,x)-----等价于-----o:f(x)
-2.函数可以有多个返回值，以逗号隔开；形参也可多可少;多个返回值多重赋值给变量，若变量数量多了，则以nil填补，若返回值多了，则后面的丢弃；
-3.函数返回值若没有，则返回nil，若函数调用不是最后一个元素，则只返回第一个值；函数调用加上括号，也只返回第一个值；
-3.unpack 		-- 接受一个数组作为参数，并将所有元素依次从下标1开始返回；主要用途:泛型调用
-4. ...			-- 变长参数 接受不同数量的实参，函数中访问也是用 "..."
-5.select(s, ...)-- 函数：变长参数中可能存在一些nil，此时需要select使用函数访问变长参数，否则nil后的参数将不会访问；
+2. 函数可以有多个返回值，以逗号隔开；形参也可多可少;多个返回值多重赋值给变量，若变量数量多了，则以nil填补，若返回值多了，则后面的丢弃；
+3. 函数返回值若没有，则返回nil，若函数调用不是最后一个元素，则只返回第一个值；函数调用加上括号，也只返回第一个值；
+4. unpack 		-- 接受一个数组作为参数，并将所有元素依次从下标1开始返回；主要用途:泛型调用
+5. ...			-- 变长参数 接受不同数量的实参，函数中访问也是用 "..."
+6. select(s, ...)-- 函数：变长参数中可能存在一些nil，此时需要select使用函数访问变长参数，否则nil后的参数将不会访问；
 				-- 调用select时,需传入一个固定实参s,若s为数字n,则select返回第n个可变实参;
 				-- 否则,selector只能为”#”,返回边长参数的总数；
 select('#', ...)-- 返回变长参数的总长(包含nil);
 
-特殊符号：
-#				-- 长度操作符:将其放在字符串前，可得到字符串长度；放在table前得到最大索引值
+7. #长度操作符:将其放在字符串前，可得到字符串长度；放在table前得到最大索引值
 
--- 基本常用函数
++ 基本常用函数
 tonumber(e [, base]) 	-- 参数e转换为数字,当不能转换时返回nil;base(2~36)指出参数e当前使用的进制，默认10进制
 tostring() 				-- 转换成字符串；此函数将会触发元表的__tostring事件
 type()					-- 返回参数的类型名("nil"，"number", "string", "boolean", "table", "function", "thread", "userdata")
@@ -710,35 +710,32 @@ math.randomseed|设置随机种子,在使用math.random之前须使用此函数|
 math.random|获取随机数|math.random():[0,1)的随机数;math.random(100):[1,100]的随机数;math.random(2, 6):[2,6]的随机数
 
 #十九、table库
-table.insert(tab, pos, value)		-- 指定位置pos(默认结尾)插入value
-table.remove(tab, pos)				-- 移除指定位置pos(默认结尾)的数据
-table.getn(tab)						-- 返回元素个数
-table.setn(tab, nSize)				-- 设置table中的元素个数
-table.maxn(tab) 					-- 返回tab中所有正key值中最大的key值.若不存在正key值, 则返回0.注意:此函数不限于table的数组部分
-table.concat(tab, sep, s, e)		-- 把从索引s(默认1)开始到索引e(默认总长)把表中所有数据(数组部分)以分隔符sep链接成一个字符，遇到nil则结束；
-table.sort(tab, fun)				-- 升序排序(fun可选)fun:规范带两个参数,并返回一个boolean;
-table.foreachi(tab, function(i, v))	-- 会期望一个从数字1开始的连续整数范围，遍历table中的key和value逐对进行function(i, v)操作
-table.foreach(tab, function(i, v))	-- 与foreachi不同的是，foreach会对整个表进行迭代
+function|describe|栗子
+--|:--:|--
+table.insert(tab, pos, value)		| 指定位置pos(默认结尾)插入value
+table.remove(tab, pos)				| 移除指定位置pos(默认结尾)的数据
+table.getn(tab)						| 返回元素个数
+table.setn(tab, nSize)				| 设置table中的元素个数
+table.maxn(tab) 					| 返回tab中所有正key值中最大的key值.若不存在正key值, 则返回0.此函数不限于数组部分
+table.concat(tab, sep, s, e)		| 把从索引s(默认1)开始到索引e(默认总长)把表中所有数据(数组部分)以分隔符sep链接成一个字符，遇到nil则结束；
+table.sort(tab, fun)				| 升序排序(fun可选)fun:规范带两个参数,并返回一个boolean;
+table.foreachi(tab, function(i, v))	| 会期望一个从数字1开始的连续整数范围，遍历table中的key和value逐对进行function(i, v)操作
+table.foreach(tab, function(i, v))	| 与foreachi不同的是，foreach会对整个表进行迭代
 
 
 #二十、string库
-string.len(s)								-- 返回字符串长度。
-string.rep(s, n)							-- 返回重复n次字符串s的串
-string.upper(s):      						-- 字符串全部转为大写字母。 
-string.lower(s):    						-- 字符串全部转为小写字母。
-string.sub(s,i,j)							-- 返回s的子字符串,从i到j(可缺,默认为末尾(-1));还可以使用负数索引(-n,倒数第n个)
-string.reverse(s)							-- 字符串反转
-> string.reverse("Lua")    		-- auL		
-string.format(...)							-- 返回一个类似c中printf的格式化字符串
-> string.format("value is:%d",4)-- value is:4
-string.char(num) 							-- 将整型数字转成字符并连接，num可以多个;
-string.byte(arg[,int][,int])				-- 字符转整数,参数二可选(默认:1),参数三可选(表示参数二到三之间所有（默认:参数二)
-> string.char(97,98,99,100)        	-- abcd	
-> string.byte("ABCD",4)				-- 68
-
---模式匹配函数
-string.find (str, substr, [init, [end]])	-- 在一个指定的目标字符串中搜索指定的内容(第三个参数为索引),返回其具体位置。不存在则返回nil。
---> string.find("Hello Lua", "Lua", 1)-- 7 9
+function|describe|栗子
+--|:--:|--
+string.len(s)								| 返回字符串长度。
+string.rep(s, n)							| 返回重复n次字符串s的串
+string.upper(s):      						| 字符串全部转为大写字母。 
+string.lower(s):    						| 字符串全部转为小写字母。
+string.sub(s,i,j)							| 返回s的子字符串,从i到j(可缺,默认为末尾(-1));还可以使用负数索引(-n,倒数第n个)
+string.reverse(s)							| 字符串反转| string.reverse("Lua") == auL		
+string.format(...)							| 返回一个类似c中printf的格式化字符串 | string.format("value is:%d",4)== value is:4
+string.char(num) 							| 将整型数字转成字符并连接，num可以多个;
+string.byte(arg[,int][,int])				| 字符转整数,参数二可选(默认:1),参数三可选(表示参数二到三之间所有（默认:参数二)|string.char(97,98,99,100) == abcd ;string.byte("ABCD",4) == 68
+string.find (str, substr, [init, [end]])	|模式匹配函数:在一个指定的目标字符串中搜索指定的内容(第三个参数为索引),返回其具体位置。不存在则返回nil。| string.find("Hello Lua", "Lua", 1)-- 7 9
 
 string.match()								-- 搜索匹配的部分,并返回部分字符串
 -->string.match("Hello World", "World")		-- World
