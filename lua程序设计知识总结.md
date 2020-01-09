@@ -14,8 +14,8 @@
 * lua是从上向下一行行执行的,所以调用函数等,需要是已经定义过的才行;否则调用的将是nil
 * 语句之间分隔: ; / 空白
 * 语句块: do  end
-* 赋值语句: 多重赋值 a,b,c = 1,2,3 -- 在多重赋值中，先将等号右边的值进行运算，之后一一放入左边变量中；
-* 变量默认为全局变量
+* 支持**多重赋值** a,b,c = 1,2,3 -- 在多重赋值中，先将等号右边的值进行运算，之后一一放入左边变量中；
+* **变量默认为全局变量**
 
 &ensp;注释
 ```
@@ -23,8 +23,7 @@
 多行: --[[ ]] (可以嵌套)
 ```
 #二.类型与值
-Lua的索引都是从1开始
-type() 		-- 函数返回变量类型(返回的是一个string)
+**Lua的索引都是从1开始**
 
 类型|名字|说明
 -|-|-
@@ -44,7 +43,6 @@ thread  | 线程      |并不是不是真正的抢先式多线程
 * [[ ]] 		:存放多行字符串
 * ..			:字符串连接符(操作符左右有数字会自动将数值转换为字符串)
 * t = {}    	: 创建了一个table,lua的赋值即是构造
-* #t :table最大索引值(数组部分)
 
 #三.表达式
 1. 算术：+ 、-、*、/ 、%、 ^(乘幂)
@@ -59,76 +57,83 @@ thread  | 线程      |并不是不是真正的抢先式多线程
 nil and 5:为假返回nil；
 x = x or v --等价于 if not x then x = v end
 Max = (a > b) and a or b   -- 等价于c语言 的a>b?a:b
-4. 优先级
-一级：^				二级:not # -(一元)
-三级:* / %			四级: + -
-五级: ..			六级: <  > 	>= 	<= 	~=   ==
-七级:and			八级:or
+优先级|符号
+-|-
+一级|^
+二级|not # -(一元)
+三级|* / %			
+四级| + -
+五级| ..			
+六级| <  > 	>= 	<= 	~=   ==
+七级|and			
+八级|or
 
 
 #四.语句
-1.local -- 局部变量
-2.if语句：if (条件) then (语句) elseif  (条件) then  (语句) else (语句) end
-3.while  (条件true)  do (语句) end
-4.repeat (语句) until (条件true) 	-- 重复直到为真；   
-5.for：
-for var=i,n,k do (语句) end
--- k是步长,(可选的)，若不写则默认k为1,从i到n;若不想设置上限，使用常量math.huge;
--- 注意:控制变量会在开始前一次性求值，并自动声明为for语句的局部变量；
+1. **local**:局部变量
+2. **if**：if (条件) then (语句) elseif  (条件) then  (语句) else (语句) end
+3. **while**  (条件true)  do (语句) end
+4. **repeat** (语句) until (条件true) 	-- 重复直到为真；   
+5. **for**：循环
+* for var=i,n,k do (语句) end
+ k是步长(可不写,默认1),从i到n循环执行语句;若不想设置上限，使用常量math.huge;**控制变量会在开始前一次性求值，并自动声明为for语句的局部变量；**
 
-for i,v in ipairs(a) do (语句) end -- 是通过iterator来遍历所有值。
+* for i,v in ipairs(a) do (语句) end : 是通过iterator来遍历所有值。
 -- 迭代文件每行(io.lines)/迭代table元素(pairs)/迭代数组(ipairs)/迭代字符串单词	(string.gmatch).
 
-6.break/return -- 只能是块的最后一条语句，或者end/else/until之前的一条语句。若想添进其他语句之间需要用do return end 进行包装；
+6. **break/return** :只能是块的最后一条语句，或者end/else/until之前的一条语句。若想添进其他语句之间需要用do return end 进行包装；
 --注意：lua没有continue；
 
 
 #五.函数
-1. ： 			-- 冒号操作符 o.foo(o,x)-----等价于-----o:f(x)
-2. 函数可以有多个返回值，以逗号隔开；形参也可多可少;多个返回值多重赋值给变量，若变量数量多了，则以nil填补，若返回值多了，则后面的丢弃；
-3. 函数返回值若没有，则返回nil，若函数调用不是最后一个元素，则只返回第一个值；函数调用加上括号，也只返回第一个值；
-4. unpack 		-- 接受一个数组作为参数，并将所有元素依次从下标1开始返回；主要用途:泛型调用
-5. ...			-- 变长参数 接受不同数量的实参，函数中访问也是用 "..."
-6. select(s, ...)-- 函数：变长参数中可能存在一些nil，此时需要select使用函数访问变长参数，否则nil后的参数将不会访问；
-				-- 调用select时,需传入一个固定实参s,若s为数字n,则select返回第n个可变实参;
+1. **冒号操作符(: )**:o.foo(o,x)-----等价于-----o:f(x)
+2. 函数可以有**多个返回值**和多个形参，以逗号隔开；多返回值多重赋值给变量，若变量数量多了，则以nil填补;
+3. 函数返回值若没有，则返回nil，若**函数调用不是最后一个元素，则只返回第一个值；函数调用加上括号，也只返回第一个值；**
+4. **unpack**:接受一个数组作为参数，并将所有元素依次从下标1开始返回；主要用途:泛型调用
+5. **变长参数(...)**:接受不同数量的实参，函数中访问也是用 "..."
+6. **select(s, ...)**：变长参数中可能存在一些nil，此时需要select使用函数访问变长参数，否则nil后的参数将不会访问；
+* 调用select时,需传入一个固定实参s,若s为数字n,则select返回第n个可变实参;
 				-- 否则,selector只能为”#”,返回边长参数的总数；
-select('#', ...)-- 返回变长参数的总长(包含nil);
+* select('#', ...)-- 返回变长参数的总长(包含nil);
 
-7. #长度操作符:将其放在字符串前，可得到字符串长度；放在table前得到最大索引值
+7. **长度操作符(#)**:将其放在字符串前，可得到字符串长度；放在table前得到最大索引值(数组部分)
 
-+ 基本常用函数
-tonumber(e [, base]) 	-- 参数e转换为数字,当不能转换时返回nil;base(2~36)指出参数e当前使用的进制，默认10进制
-tostring() 				-- 转换成字符串；此函数将会触发元表的__tostring事件
-type()					-- 返回参数的类型名("nil"，"number", "string", "boolean", "table", "function", "thread", "userdata")
-print()					-- 简单的以tostring方式格式化输出参数的内容
-next(table[,index]) 	-- 返回table的索引index的下一个值,index为nil,返回当前的table的第一个值;当索引号为最后一个索引或表为空时将返回nil
-注意:table的判空next(t) == nil
+基本常用函数
+函数|描述
+-|-
+tonumber(e [, base]) | 参数e转换为数字,当不能转换时返回nil;base(2~36)指出参数e当前使用的进制，默认10进制
+tostring()| 转换成字符串；此函数将会触发元表的__tostring事件
+type()|返回参数的类型名("nil"，"number", "string", "boolean", "table", "function", "thread", "userdata")
+print()|简单的以tostring方式格式化输出参数的内容
+type()| 函数返回变量类型(返回的是一个string)
+**小提示**: table的判空next(t) == nil
 
 
 #六.函数进阶:
-f=function() 等价于 function f()
-1.第一类值(与传统类型具有相同权利)：可以存储到变量中；有特定的词法域：内部函数可以访问外部函数中的变量。
-2.函数与其他值一样都是匿名的，
-3.高阶函数：就是参数由函数构成，
-4.闭合函数(closure)：就是一个函数加上该函数所需访问的所有非局部变量（upvalue）;当没有非局部变量时，closure就是一个function；Lua中的函数都是closure,
-5.沙盒（sandbox）:使用相同的技术来创建一个安全的运行环境；将一些不安全的代码放入一个安全的环境中(封装出一层能对代码进行检测的环境)进行运行;
-6.非全局的函数(non -global function):local f = function() / local function f()
-7.正确的尾调用(proper tail call): 尾调用就是当一个函数调用的是另一个函数的最后一个动作;lua中正确的是形式为:"return <fun>(<arg>)"
-	lua支持尾调用消除,正确的尾调用可以有效减少栈的开消，减轻函数调用的层次。
+**f=function() 等价于 function f()**
+1.**第一类值**(与传统类型具有相同权利)：可以存储到变量中；有特定的词法域：内部函数可以访问外部函数中的变量。
+2.**函数与其他值一样都是匿名的**，
+3.**高阶函数**：就是参数由函数构成，
+4.**闭合函数**(closure)：就是一个函数加上该函数所需访问的所有**非局部变量**（upvalue）;当没有非局部变量时，closure就是一个function；Lua中的函数都是closure,
+5.**沙盒**（sandbox）:使用相同的技术来创建一个安全的运行环境；将一些不安全的代码放入一个安全的环境中(封装出一层能对代码进行检测的环境)进行运行;
+6.**非全局的函数**(non -global function):local f = function() / local function f()
+7.**正确的尾调用**(proper tail call): 尾调用就是当一个函数调用的是另一个函数的最后一个动作;lua中正确的是形式为:"return <fun>(<arg>)"
+	**lua支持尾调用消除**,正确的尾调用可以有效减少栈的开消，减轻函数调用的层次。
   	尾调用消除：当在进行尾调用时不消耗任何栈空间，这种实现就称为尾调用消除，所以一个程序可以有无数嵌套的尾调用。
 
 
 #七.迭代器与泛型for
-1.迭代器Iterator:一种可以遍历一种集合中所有元素的机制;lua的迭代器本质表示为闭合函数;
-2.泛型for在循环过程内部保存了迭代器函数(迭代函数,恒定状态,控制变量).
-3.泛型for <var-list> in <exp-list> do <body> end	
+1. **迭代器Iterator:一种可以遍历一种集合中所有元素的机制**;lua的迭代器本质表示为闭合函数;
+2. 泛型for在循环过程内部保存了迭代器函数(迭代函数,恒定状态,控制变量).
+3. 泛型for <var-list> in <exp-list> do <body> end	
 var-list 为n个变量名列表,<exp-list> n个表达式列表;(多个表之间以逗号隔开)
 变量列表的第一元素为控制变量:当为nil时循环结束;
-4.for的初始化及循环内部原理:首先对in之后的表达式求值,
+4. for的初始化及循环内部原理:首先对in之后的表达式求值,
 返回上述三个值供for保存(仅保存三个变量,不足则以nil补足,第一个为nil则结束);
 之后for将状态和变量作为参数循环调用迭代函数返回值赋予变量列表中的变量;
 
-5.无状态的迭代器:自身不保存任何状态的迭代器(eg:ipairs),避免创建新的闭合函数开销
+5. 无状态的迭代器:自身不保存任何状态的迭代器(eg:ipairs),避免创建新的闭合函数开销
+```
 -- ipairs
 local function iter(a, i)
 	i=i+1
@@ -146,8 +151,8 @@ end
 function pairs(t)
 	return next, t, nil
 end
-
-
+```
+```
 -- 遍历链表的迭代器,小技巧:将链表头节点作为恒定状态,当前节点作为控制变量
 local function getnext(list, node)
 	if not node then
@@ -160,23 +165,22 @@ end
 function traverse(list)
 	return getnext, list, nil
 end
-
-6.尽可能的尝试编写无状态迭代器,其次不能则选择closure,而不要编写使用table的迭代器;
+```
+6. 尽可能的尝试编写无状态迭代器,其次不能则选择closure,而不要编写使用table的迭代器;
 创建一个closure比创建一个table廉价;访问upvalue也比table更快;
 协程编写迭代器功能最强,但稍微有点开销;
 
-
-
 #八.编译、执行与错误
-1.编译:
+1. 编译:
 dofile 		-- 运行lua代码块,实际上dofile是一个辅助函数,loadfile才负责核心的工作;
 loadfile 	-- 从文件加载lua代码块,单步运行,只编译代码,将编译结果作为一个函数返回;
 			-- 与dofile不同的点,loadfile不会引发错误,只返回错误的值但不处理;
+```
 function dofile(filename)
-	local f = assert(loadfile(filename))
-	return f()
+    local f = assert(loadfile(filename))
+    return f()
 end
-
+```
 loadstring -- 从字符串读取代码,而非文件,返回一个函数;
 注意:首先,loadstring功能强大,但也是一个开销比较大的函数,并且可能导致难以理解的代码;
 其次,loadstring在重新编译时不涉及词法域,loadstring总是在全局环境中编译它的字符串;
@@ -723,7 +727,7 @@ math.random|获取随机数|math.random():[0,1)的随机数;math.random(100):[1,
 
 #十九、table库
 function|describe|栗子
---|:--:|--
+--|--|--
 table.insert(tab, pos, value)		| 指定位置pos(默认结尾)插入value
 table.remove(tab, pos)				| 移除指定位置pos(默认结尾)的数据
 table.getn(tab)						| 返回元素个数
@@ -737,7 +741,7 @@ table.foreach(tab, function(i, v))	| 与foreachi不同的是，foreach会对整�
 
 #二十、string库
 function|describe|栗子
---|:--:|--
+--|--|--
 string.len(s)								| 返回字符串长度。
 string.rep(s, n)							| 返回重复n次字符串s的串
 string.upper(s):      						| 字符串全部转为大写字母。 
