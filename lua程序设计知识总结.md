@@ -690,7 +690,7 @@ end
 #十八、数学库
 
 function|describe|栗子
---|:--:|--
+--|--|--
 math.pi | 圆周率(3.14159265358979323846)
 math.abs| 绝对值|math.abs(-5.1) == 5.1
 math.ceil| 不小于x的最小整数|math.ceil(2.1) == 3 
