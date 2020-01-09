@@ -142,7 +142,6 @@ function ipairs(a)
 	return iter,a,0
 end
 
-
 -- pairs
 function pairs(t)
 	return next, t, nil
@@ -236,14 +235,17 @@ coroutine.wrap()			-- 唤醒协程..
 
 
 #十一、数据结构
-1.数组:下标从1开始
+1. 数组:下标从1开始
+```
 a = {}
 for i=1,1000 do
 	a[i] = 0
 end
+```
 
-2.矩阵与多维数组:两种方式表示矩阵:
--- table中的元素为table,N*M的矩阵
+2. 矩阵与多维数组:两种方式表示矩阵:
+```
+a. table中的元素为table,N*M的矩阵
 mt = {}
 for i=1,N do
 	mt[i] = {}
@@ -251,16 +253,19 @@ for i=1,N do
 		mt[i][j] = 0
 	end
 end
--- 将索引合并,(若字符串为索引同样进行合并)
+```
+```
+b. 将索引合并,(若字符串为索引同样进行合并)
 mt = {}
 for i=1,N do
 	for j=1,M do
 		mt[(i-1)*M+j] = 0
 	end
 end
-
-3.链表:
--- 反向链表
+```
+3. 链表:
+```
+a. 反向链表
 list = nil	-- head
 list = {next = list, value = v}	-- 在表头insert a value:第一个list是新定义的节点,后一个list是上一行的list;
 
@@ -270,11 +275,13 @@ while l do
 	<访问l.value>
 	l = l.next
 end
+```
 
-4.队列和双向队列:(先进先出)
--- 数据量小可以直接使用table.insert和table.remove进行对数组的操作达到队列的效果,操作后table会自动移动元素(数据量大会造成开销大);
+4. 队列和双向队列:(先进先出)
+* 数据量小可以直接使用table.insert和table.remove进行对数组的操作达到队列的效果,操作后table会自动移动元素(数据量大会造成开销大);
+* 数据量大就需要实现队列:使用两个索引用于表示首尾的元素
 
---数据量大就需要实现队列:使用两个索引用于表示首尾的元素
+```
 Queue = {}
 function Queue.New()
 	return {first = 0, last = 1}
@@ -307,31 +314,36 @@ function Queue.PopLast(queue)
 	queue.last = last - 1
 	return value
 end
+```
 
-5.集合与无序组(bag)
-lua表示集合,只需要将集合元素以key的形式存入table,查看是否存在只需要用该值索引是否为nil;
-无序组(包):也称多重集合,只需要将value作为计数器,key作为集合元素保存到table中即可;
-6.字符串缓冲:
--- 典型的读取代码:
+5. 集合与无序组(bag)
+* lua表示集合,只需要将集合元素以key的形式存入table,查看是否存在只需要用该值索引是否为nil;
+* 无序组(包):也称多重集合,只需要将value作为计数器,key作为集合元素保存到table中即可;
+
+6. 字符串缓冲:
+```
+典型的读取代码:lua字符串是不可变值(immutable),每次赋值都会重新移动字符串,开销极大
 local buff = ""
 for lines in io.lines() do
 	buff = buff .. lines .. "\n"
 end
---lua的字符串是不可变值(immutable),导致每次赋值会重新移动字符串,导致极大开销
+```
 
--- lua可以通过io.read("*all")读取整个文件
--- 另一种方法是可以将table作为一个字符串缓冲,使用table.concat来连接字符串
+方案1: 将table作为一个字符串缓冲,使用table.concat来连接字符串
+```
 local t = {}
 for line in io.lines() do
 	t[#t + 1] = line
 end
 t[#t + 1] = ""		-- 目的在文本最后添加一个换行符;
 local s = table.concat(t, "\n")
+```
 
--- concat & io.read 的内部原理:算法核心是一个栈,已创建的大字符串位于栈底,较小的字符串则通过栈顶进入.
--- 类似于汉诺塔,栈中的任意字符串都比下面的字符串短;若压入的新字符串比下面的字符串长,则将两者连接,
--- 然后继续跟下面的字符串比较,直至长度小于下面的字符串或者到达栈底;
-
+方案2: 通过io.read("*all")读取整个文件
+ * concat & io.read 的内部原理:**算法核心是一个栈,已创建的大字符串位于栈底,较小的字符串则通过栈顶进入.
+ 类似于汉诺塔,栈中的任意字符串都比下面的字符串短;若压入的新字符串比下面的字符串长,则将两者连接,
+ 然后继续跟下面的字符串比较,直至长度小于下面的字符串或者到达栈底;**
+```
 function addString(stack, s)
 	stack[#stack + 1] = s 		-- 压入栈顶
 	for i = #stack -1, 1, -1 do
@@ -342,11 +354,10 @@ function addString(stack, s)
 		stack[i+1] =nil
 	end
 end
-
-7.图
--- 以table为节点构建图
-
---name查找图的节点
+```
+7. 图:以table为节点构建图
+* name查找图的节点
+```
 local function name2node(graph, name)
 	if not graph[name] then
 		-- 节点不存在,构建一个新的
@@ -354,8 +365,9 @@ local function name2node(graph, name)
 	end
 	return gtaph[name]
 end
-
--- 从文件中读取数据并写入图
+```
+* 从文件中读取数据并写入图
+```
 function readgraph()
 	local graph = {}
 	for line in io.lines() do
@@ -370,7 +382,6 @@ function readgraph()
 	return graph
 end
 
--- 
 function findPath(curr, to, path, visited)
 	path = path or {}
 	visited = visited or {}
@@ -397,12 +408,12 @@ function printpath(path)
 	end
 end
 
-g= readgraph()
+g = readgraph()
 a = name2node(g, "a")
 b = name2node(g, "b")
 p = findPath(a,b)
 if p then printPath(p) end
-
+```
 #十二、数据文件与持久性
 1.数据文件:可借用lua的table构造式来定义文件格式;将数据作为lua代码来输出;
 eg:tab{"川", 24, gameplayer, ...}
