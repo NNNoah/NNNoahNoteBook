@@ -172,8 +172,8 @@ end
 
 #八.编译、执行与错误
 1. 编译:
-dofile 		-- 运行lua代码块,实际上dofile是一个辅助函数,loadfile才负责核心的工作;
-loadfile 	-- 从文件加载lua代码块,单步运行,只编译代码,将编译结果作为一个函数返回;
+**dofile** 		-- 运行lua代码块,实际上dofile是一个辅助函数,loadfile才负责核心的工作;
+**loadfile** 	-- 从文件加载lua代码块,单步运行,只编译代码,将编译结果作为一个函数返回;
 			-- 与dofile不同的点,loadfile不会引发错误,只返回错误的值但不处理;
 ```
 function dofile(filename)
@@ -181,61 +181,63 @@ function dofile(filename)
     return f()
 end
 ```
-loadstring -- 从字符串读取代码,而非文件,返回一个函数;
+**loadstring** -- 从字符串读取代码,而非文件,返回一个函数;
 注意:首先,loadstring功能强大,但也是一个开销比较大的函数,并且可能导致难以理解的代码;
 其次,loadstring在重新编译时不涉及词法域,loadstring总是在全局环境中编译它的字符串;
+```
 i=32
 local i = 0
 f = loadstring("i = i + 1; print(i)")
 g = function() i = i + 1; print(i) end
 f()		-- > 33		-- 不涉及词法域
 g()		-- > 1
-
-load --loadfile和loadstring的底层函数,接受一个"读取器函数",并在内部调用它来获取程序块;
+```
+**load** --loadfile和loadstring的底层函数,接受一个"读取器函数",并在内部调用它来获取程序块;
 读取器函数可以分多次返回一个程序块,load会反复调用直至返回nil;
 一般很少使用load,特殊情况下:程序块过大或者不在文件中;
 注意:lua将所有独立的程序块视为一个匿名函数的函数体,并具有一个变长参数.
 
-2.Lua提供的有关动态链接的功能都聚集在一个函数中,即package.loadlib.
+2. 
+**package.loadlib** :Lua提供的有关动态链接的功能都聚集在一个函数中,即.
 该函数有两个字符串函数:动态库的完整路径和一个函数名称.
 例子:
 local path = "/user/socket.so"
 local f = package.loadlib(path, "luaopen_socket")
 
-3.error
-assert -- 内建函数,检测第一个参数是否为true,为true返回true;否则引发错误,第二个参数为信息字符串(可选)
+3. error
+**assert** -- 内建函数,检测第一个参数是否为true,为true返回true;否则引发错误,第二个参数为信息字符串(可选)
 
 
 
 #九.协同程序coroutine
-1.原理:有一个条执行序列,拥有自己独立的栈、局部变量和指令指针,同时又与其他协程共享全局变量和其他大部分东西;
-但协程任意时刻只能执行一个协程,切正在运行的协程只会在显示的要求挂起时,它的执行才会暂停.
-2.lua将所有有关协程的函数放置在一个coroutine的table中;
+lua提供的是一种完整的"非对称的协同程序"(semi-coroutine):即lua提供了两个函数控制协程的执行,一个用于挂起执行,一个用于恢复执行.
+1. 原理:有一个条执行序列,拥有自己独立的栈、局部变量和指令指针,同时又与其他协程共享全局变量和其他大部分东西;但**协程任意时刻只能执行一个协程**,切正在运行的协程只会在显示的要求挂起时,它的执行才会暂停.
+2. lua将所有有关协程的函数放置在一个coroutine的table中;
 协程的四种状态:挂起(suspended)/运行(running)/死亡(dead)/正常(normal)
 当A协程唤醒另一个协程B时,协程a就处于normal状态
-coroutine.create(f())		-- 创建协程,返回一个thread类型的值;当前处于挂起
-coroutine.status(thead)		-- 查询协程的状态
-coroutine.resume(thead)		-- 启动/再次启动一个协程的执行,并修改状态由挂起到运行;执行成功返回true
-注意:resume是在保护模式中运行的,因此lua不会显示其错误消息;
-coroutine.yield()			-- 挂起
-lua提供的是一种完整的"非对称的协同程序"(semi-coroutine):即lua提供了两个函数控制协程的执行,一个用于挂起执行,一个用于恢复执行.
-3.管道(pipe)与过滤器(filter)
-coroutine.wrap()			-- 唤醒协程..
 
-4.非抢先式的(non-preemptive)多线程
+3. 管道(pipe)与过滤器(filter)
+
+4. 非抢先式的(non-preemptive)多线程:
 协程与常规多线程区别:协程是非抢先式的,即当一个协程运行时,无法从外部停止它.
 这样协程的同步就是显式的,但有若一个非抢先式的线程的一条线程调用了阻塞(blocking)操作,
 整个程序都会在阻塞完成前停止.这对很多程序是无法接受的.
 解决办法:
 
+方法|描述
+-|-
+coroutine.create(f()) 	| 创建协程,返回一个thread类型的值;当前处于挂起
+coroutine.status(thead)	| 查询协程的状态
+coroutine.resume(thead)	| 启动/再次启动一个协程的执行,并修改状态由挂起到运行;执行成功返回true;注意:**resume是在保护模式中运行的,因此lua不会显示其错误消息**;
+coroutine.yield()		| 挂起
+coroutine.wrap() 		| 唤醒协程
 
 
 #十、完整的示例
 1.数据描述:
-2.马尔科夫链原理:是一种数学相关的概率统计理论.
-简单的说,以一个状态机为例,n个前序状态影响到达的后序状态称为这个状态序列为n阶马尔科夫链.
+2.**马尔科夫链**,离散时间马尔可夫链（discrete-time Markov chain，缩写为DTMC):为状态空间中经过从一个状态到另一个状态的转换的随机过程.该过程要求具备“无记忆”的性质：下一状态的概率分布只由当前状态决定，在时间序列中它前面的事件均与之无关.这种特定类型的“无记忆性”称作马尔可夫性质.
+n阶马尔科夫链:以一个状态机为例,n个前序状态影响到达的后序状态.
 应用:自然界的状态演算,google的搜索用户习性推演等;
-
 
 
 #十一、数据结构
