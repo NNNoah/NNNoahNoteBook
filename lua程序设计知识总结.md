@@ -763,8 +763,8 @@ string.lower(s):    						| 字符串全部转为小写字母。
 string.sub(s,i,j)							| 返回s的子字符串,从i到j(可缺,默认为末尾(-1));还可以使用负数索引(-n,倒数第n个)
 string.reverse(s)							| 字符串反转| string.reverse("Lua") == auL
 string.format(...)							| 返回一个类似c中printf的格式化字符串 | string.format("value is:%d",4)== value is:4
-string.char(num) 							| 将整型数字转成字符并连接，num可以多个;
-string.byte(arg[,int][,int])				| 字符转整数,参数二可选(默认:1),参数三可选(表示参数二到三之间所有（默认:参数二)|string.char(97,98,99,100) == abcd ;string.byte("ABCD",4) == 68
+string.char(num) 							| 将整型数字转成字符并连接，num可以多个|string.char(97,98,99,100) == abcd
+string.byte(arg[,int][,int])				| 字符转整数,参数二可选(默认:1),参数三可选(表示参数二到三之间所有（默认:参数二)|string.byte("ABCD",4) == 68
 string.find (str, substr, [init, [end]])	|模式匹配函数:在一个指定的目标字符串中搜索指定的内容(第三个参数为索引),返回其具体位置。不存在则返回nil。| string.find("Hello Lua", "Lua", 1)-- 7 9
 string.match()	| 搜索匹配的部分,并返回部分字符串|string.match("Hello World", "World"-- World;string.match("today is 1994/8/7", "%d+/%d+/%d+")	-- 1994/8/7
 string.gmatch(s, pattern)|返回一个迭代器函数,每一次调用这个函数,返回一个在s找到的下一个符合pattern描述的子串。如果参数pattern描述的字符串没有找到，迭代函数返回nil
