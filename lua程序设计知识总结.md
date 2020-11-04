@@ -61,6 +61,7 @@ thread  | 线程      |并不是不是真正的抢先式多线程
 nil and 5:为假返回nil；
 x = x or v --等价于 if not x then x = v end
 Max = (a > b) and a or b   -- 等价于c语言 的a>b?a:b
+
 优先级|符号
 -|-
 一级|^
