@@ -19,6 +19,9 @@
   
 * 贴图资源:android压缩:etc1的压缩需要是POT(2的幂方),etc2的压缩需要是4的倍数;不透明的使用ETC格式，透明的使用ETC2格式
 
+##游戏对象显示层级相关
+* 影响显示层级主要因素:Camera Depth;对象layer层级;meshrenderer的sortinglayer和sortingorder大小;材质的
+
 ## 4.其他
 
 * System.Enviroment.TickCount,上次系统启动经过的毫秒(计时器),是一个带符号的32位int;大约25天后数据变为负值,若使用记得处理负值
