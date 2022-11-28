@@ -1,0 +1,78 @@
+UnityECS:0.17.0-preview.41
+
+1.Dots = ECS + Burst编译 + Job
+2.ECS(Entity Component System):
+2.Burst编译:
+3.JobSystem:C#任务作业系统(多线程实现)
+4.Unity.Mathematics:新数学库,可SIMD(Single Instruction Multiple Data,单指令多数据流,能够复制多个操作数,并把它们打包在寄存器的一组指令集)矢量化处理;
+
+独立构建
+独立构建 DOTS 项目需要为每个目标平台安装相应的平台包：
+com.unity.platforms.android
+com.unity.platforms.ios
+com.unity.platforms.linux
+com.unity.platforms.macos
+com.unity.platforms.web
+com.unity.platforms.windows
+安装您需要的平台包后，为每个平台创建一个“经典构建配置”资产（通过"Assets>Create>Build"菜单）。该资产的属性将包含一个“场景列表”，这是将子场景添加到独立项目的唯一方法。确保您至少添加了一个场景或“构建当前场景”复选框已打开。
+
+警告
+不要使用"File>Build and Run"来构建DOTS项目。必须使用 Build Configuration Asset Inspector窗口顶部的"Build"或"Build and Run"按钮来构建您的项目。
+
+
+1. 原型(EntityArchetype):组件类型的独特组合,实体的原型决定了 ECS 存储该实体组件的位置
+2. 原型内存块(ArchetypeChunk):每个原型存储的实体内存块
+3. 实体查询(EntityQuery):筛选符合条件的原型(All, Any, None)
+
+ECS:
+World:unity在程序启动时,会默认创建一个默认World,可以创建多个world,每一个world是没有关联的并行空间;在world中进行按group/system的顺序执行;group也是system,组内所有系统完成则顺序今夏一个system/group;
+一个world拥有一个EntityManager和一组Systems.
+World.DefaultGameObjectInjectionWorld访问默认世界。
+每个世界有一个TimeData的实体,该实体由UpdateWorldTimeSystem管理;System的Time是TimeData的别名;
+
+#UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP_RUNTIME_WORLD 禁用默认运行时世界的生成。
+#UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP_EDITOR_WORLD 禁用默认编辑器世界的生成。
+#UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP 禁用两个默认世界的生成。
+
+SystemBase:系统更新发生在主线程上。但是,系统可以使用作业将工作放到其他线程。SystemBase提供了一种直接的方式来创建和调度作业;
+
+EntityCommandBuffer:(ECB)解决两个重要问题：
+1.当job在工作时,无法访问EntityManager.
+2.当数据结构更改(如创建实体)时，您将创建一个同步点并且必须等待所有作业完成。
+
+该EntityCommandBuffer允许你排队修改(无论是从工作或从主线程),稍后在主线程上后生效.
+注意:最好使用现有的EntityCommandBuffer系统，而不是创建自己的系统，以尽量减少同步点
+
+默认系统组:
+//(Initialization阶段结束时更新)
+1.InitializationSystemGroup 
+    BeginInitializationEntityCommandBufferSystem
+    CopyInitialTransformFromGameObjectSystem
+    SubSceneLiveLinkSystem
+    SubSceneStreamingSystem
+    EndInitializationEntityCommandBufferSystem
+//(Update阶段结束时更新)
+2.SimulationSystemGroup 
+    BeginSimulationEntityCommandBufferSystem
+    TransformSystemGroup
+    EndFrameParentSystem
+    CopyTransformFromGameObjectSystem
+    EndFrameTRSToLocalToWorldSystem
+    EndFrameTRSToLocalToParentSystem
+    EndFrameLocalToParentSystem
+    CopyTransformToGameObjectSystem
+    LateSimulationSystemGroup
+    EndSimulationEntityCommandBufferSystem
+//(PreLateUpdate阶段结束时更新)
+3.PresentationSystemGroup 
+    BeginPresentationEntityCommandBufferSystem
+    CreateMissingRenderBoundsFromMeshRenderer
+    RenderingSystemBootstrap
+    RenderBoundsUpdateSystem
+    RenderMeshSystem
+    LODGroupSystemV1
+    LodRequirementsUpdateSystem
+    EndPresentationEntityCommandBufferSystem
+
+
+同步点(sync point):是程序执行中的一个点，它等待到目前为止已调度的所有作业完成
